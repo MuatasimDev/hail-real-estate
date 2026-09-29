@@ -1,4 +1,8 @@
 
+"use client"
+import Image from "next/image";
+import {useState} from "react";
+import PropertyFilters from "./components/FiltersBox";
 import {Bed, Bath, Ruler} from "lucide-react";
 import Link from "next/link";
 import { properties} from"./properties/data";
@@ -10,6 +14,7 @@ function PropertyCard( {
   area,
   rooms,
   bathrooms,
+  images,
 }: {
   id:string;
   title:string;
@@ -18,6 +23,7 @@ function PropertyCard( {
   area:string;
   rooms:string;
   bathrooms:string;
+  images:string[];
 
 }) {
   return (
@@ -27,16 +33,21 @@ function PropertyCard( {
         
           {
             <div  className="bg-white  rounded-xl shadow overflow-hidden flex">
-      <div className="w-33 sm:w-48 bg-gray-200 flex items-center justify-center flex-none">
-        صورة العقار
-      </div>
+      <div className="relative w-33 sm:w-48 flex-none">
+  <Image
+    src={images[0]}
+    alt={title}
+    fill
+    className="object-cover"
+  />
+</div>
 
     <div className="flex-1 p-4 text-right" dir="rtl">
         <h2 className="text-xl fount-bold mb-2">
            {title}
         </h2>
 
-        <p className="text-gray-500 mb-2">
+        <p className="text-gray-700 font-bold mb-2">
            {district}
         </p>
         <p className="font-bold text-lg">
@@ -74,10 +85,34 @@ function PropertyCard( {
 }
 
 export default function Home() {
+  
+  const [status, setStatus] = useState("");
+const [type, setType] = useState("");
+const [district, setDistrict] = useState("");
+
+const filteredproperties = properties.filter((property) => {
+  const matchStatus =
+    status === "" || property.status === status;
+
+  const matchType =
+    type === "" || property.type === type;
+
+  const matchDistrict =
+    district === "" || property.district.includes(district);
+
+  return matchStatus && matchType && matchDistrict;
+});
+
   return (
     <main className="flex flex-col items-center pt-16  gap-4 bg-gray-100 min-h-screen ">
 
-      {properties.map((property)=> (
+     <PropertyFilters
+  setStatus={setStatus}
+  setType={setType}
+  setDistrict={setDistrict}
+/>
+
+      {filteredproperties.map((property)=> (
         <PropertyCard
         key={property.id}
         id={property.id}
@@ -87,6 +122,7 @@ export default function Home() {
         area={property.area}
         rooms={property.rooms}
         bathrooms={property.bathrooms}
+        images={property.images}
         />
       ))}
     
